@@ -152,6 +152,8 @@ const textFilePaths: Record<TTextFiles, Array<string>> = {
     // ],
 };
 
+const rootPath = "./data_patch_6";
+
 const rootTemplatesPaths = [
     "Gustav/Public/Gustav/RootTemplates",
     "Gustav/Public/GustavDev/RootTemplates",
@@ -159,12 +161,9 @@ const rootTemplatesPaths = [
     "Shared/Public/SharedDev/RootTemplates",
 ];
 
-const localizationFilePath = "./data/localization.json";
+const localizationFilePath = `${rootPath}/Localization/english.json`;
 
 const LSJCache: Record<string, ILSJTemplate> = {};
-
-const pathToDivineExe = "./tools/divine.exe";
-const divineExeOptTemplate = `-g bg3 -s %SRC% -d %DEST% -a convert-resource -o lsj`;
 
 function warn(...params: string[]) {
     console.warn(...params);
@@ -183,8 +182,11 @@ function findShortestString(strings: string[]): string | null {
 async function main(): Promise<void> {
     // load localization JSON file
     const localizationJSON: Array<{
-        "-contentuid": string;
-        "#text": string;
+        "_": string;
+        "$": {
+            "contentuid": string
+            "version": string
+        };
     }> = JSON.parse(
         fs.readFileSync(
             localizationFilePath,
@@ -218,7 +220,7 @@ async function main(): Promise<void> {
                 .forEach((folderPath: string) => {
                     const fileBuffer =
                         fs.readFileSync(
-                            `./data/${folderPath}`,
+                            `${rootPath}/${folderPath}`,
                             "utf8"
                         );
                     resArr.push(fileBuffer);
@@ -276,8 +278,8 @@ async function main(): Promise<void> {
                         // localization keys: (...matches)
                         result[entry.key].name = localizationJSON
                             .find(
-                                (i) => i["-contentuid"] === disName
-                            )?.["#text"] || "";
+                                (i) => i["$"].contentuid === disName
+                            )?.["_"] || "";
                     }
                     if(
                         entry.otherData["Description"]
@@ -290,8 +292,8 @@ async function main(): Promise<void> {
                         // localization keys: (...matches)
                         result[entry.key].description = localizationJSON
                             .find(
-                                (i) => i["-contentuid"] === desc
-                            )?.["#text"] || "";
+                                (i) => i["$"].contentuid === desc
+                            )?.["_"] || "";
                     }
 
                     if(
@@ -332,16 +334,16 @@ async function main(): Promise<void> {
                                 // localization keys: (...matches)
                                 result[entry.key].name = localizationJSON
                                     .find(
-                                        (i) => i["-contentuid"] ===  goRef.DisplayName?.handle
-                                    )?.["#text"] || "";
+                                        (i) => i["$"].contentuid ===  goRef.DisplayName?.handle
+                                    )?.["_"] || "";
                             }
 
                             if(!entry.otherData["Description"]) {
                                 // localization keys: (...matches)
                                 result[entry.key].description = localizationJSON
                                     .find(
-                                        (i) => i["-contentuid"] ===  goRef.Description?.handle
-                                    )?.["#text"] || "";
+                                        (i) => i["$"].contentuid ===  goRef.Description?.handle
+                                    )?.["_"] || "";
                             }
                             if(
                                 goRef.Icon &&
